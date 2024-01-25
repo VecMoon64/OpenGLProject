@@ -1,0 +1,11 @@
+# ninja log v5
+7	494	7278943554287985	CMakeFiles/OpenGLApp.dir/main.cpp.obj	ff407995e93c2c78
+49	5420	7278943603703526	CMakeFiles/OpenGLApp.dir/lib/imgui-master/imgui_widgets.cpp.obj	1a31d5eba125c2c
+25	2056	7278943569752962	CMakeFiles/OpenGLApp.dir/lib/imgui-master/imgui_demo.cpp.obj	dfde3dcc422e2e13
+60	5022	7278943599724610	CMakeFiles/OpenGLApp.dir/lib/imgui-master/backends/imgui_impl_glfw.cpp.obj	6bd49f197bcd18e2
+82	3752	7278943586698135	CMakeFiles/OpenGLApp.dir/lib/imgui-master/backends/imgui_impl_opengl3.cpp.obj	7336e3af63f8e95a
+31	5183	7278943601249751	CMakeFiles/OpenGLApp.dir/lib/imgui-master/imgui_draw.cpp.obj	b41e8f388fcac1b5
+14	3979	7278943589220166	CMakeFiles/OpenGLApp.dir/glad.c.obj	82708b16424e0f81
+39	4256	7278943592020734	CMakeFiles/OpenGLApp.dir/lib/imgui-master/imgui_tables.cpp.obj	84690e301ebcf0ad
+19	6908	7278943618497961	CMakeFiles/OpenGLApp.dir/lib/imgui-master/imgui.cpp.obj	fde567ff3b343f15
+6908	7352	7278943622868969	OpenGLApp.exe	c58f26a15c14829f
