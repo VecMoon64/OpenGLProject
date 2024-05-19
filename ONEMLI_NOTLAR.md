@@ -205,7 +205,7 @@ void print_message(const char* message);
     conf_file = io.open(project_name .. seperator .. "moony.conf","w")
 
     if conf_file then
-        conf_file:write(string.format("project_name = %s\nproject_type = %s\nbinary_name = %s\nroot_path = %s\ninclude_path = %s\nsrc_path = %s\nlib_path = %s\nobject_path = %s\nhistory_path = %s\ncommits_enabled = %s\nlast_commit_number = 0", project_name, project_type, project_name, root_folder, include_folder, src_folder, lib_folder, object_folder, history_folder, "false"))
+        conf_file:write(string.format("project_name = %s\nproject_type = %s\nbinary_name = %s\nroot_path = %s\ninclude_path = %s\nsrc_path = %s\nlib_path = %s\nobject_path = %s\nhistory_path = %s\ncommits_enabled = %s\nlast_commit_number = 0\ncompiler_version = 14\nenable_warnings = true", project_name, project_type, project_name, root_folder, include_folder, src_folder, lib_folder, object_folder, history_folder, "false"))
     end
 end
 
@@ -223,6 +223,8 @@ function Compile_Project(is_info_enabled)
     local bin_folder
     local history_folder
     local is_commits_enabled 
+    local compiler_version
+    local enable_warnings
 
     if conf_file then
         for line in conf_file:lines() do
@@ -251,10 +253,22 @@ function Compile_Project(is_info_enabled)
                 history_folder = value
             elseif string.find(line, "commits_enabled") then
                 is_commits_enabled = value
+            elseif string.find(line, "compiler_version") then
+                compiler_version = value
+            elseif string.find(line, "enable_warnings") then
+                enable_warnings = value
             end
         end
     else
         print(red .. "Configuration file doesn't exists" .. reset)
+    end
+
+    local warning_code = ""
+
+    if enable_warnings == "true" then
+        warning_code = " -Wall"
+    else
+        warning_code = ""
     end
 
     print(cyan .. "\nCompilation of " .. project_name .. " is started...\n" .. reset)
@@ -286,16 +300,16 @@ function Compile_Project(is_info_enabled)
     if is_commits_enabled == "true" then
         os.execute(create_dir_command .. "\"" .. history_folder .. seperator .. current_time .. "-commit" .. "\"")
         if is_unix then
-            os.execute("rsync -av --exclude=" .. "\'" .. history_folder .. "\'" .. root_folder .. " " .. history_folder .. seperator .. current_time .. "-commit" .. " /E /XD " .. history_folder)
+            os.execute("rsync -av --exclude=" .. "\'" .. history_folder .. "\' " .. root_folder .. " " .. history_folder .. seperator .. current_time .. "-commit")
         else 
             os.execute("robocopy " .. root_folder .. " " .. history_folder .. seperator .. current_time .. "-commit" .. " /E /XD " .. history_folder)
         end
     end
     conf_file = io.open(current_path .. seperator .. "moony.conf", "r")
 
-    local compile_command = "g++ -c "
+    local compile_command = "g++ -c " .. "--std=c++" .. compiler_version .. " " .. warning_code .. " " 
     if project_type == "shared" then
-        compile_command = "g++ -c -fPIC "
+        compile_command = "g++ -c -fPIC " .. "--std=c++" .. compiler_version .. " " .. warning_code .. " " 
     end
     conf_file = io.open(current_path .. seperator .. "moony.conf", "r")
 
@@ -440,6 +454,8 @@ function Link_Project(is_info_enabled)
     local object_folder
     local bin_folder
     local history_folder 
+    local compiler_version
+    local enable_warnings
 
     if conf_file then
         for line in conf_file:lines() do
@@ -468,10 +484,22 @@ function Link_Project(is_info_enabled)
                 object_folder = value
             elseif string.find(line, "history_path") then
                 history_folder = value
+            elseif string.find(line, "compiler_version") then
+                compiler_version = value
+            elseif string.find(line, "enable_warnings") then
+                enable_warnings = value
             end
         end
     else
         print("Conf file doesnt exists")
+    end
+
+    local warning_code = ""
+
+    if enable_warnings == "true" then
+        warning_code = " -Wall"
+    else
+        warning_code = ""
     end
 
     print(cyan .. "\nLinking of " .. project_name .. " is started...\n" .. reset)
@@ -501,7 +529,7 @@ function Link_Project(is_info_enabled)
     local libraries = {}
 
     if project_type == "executable" then
-        link_command = "g++ "
+        link_command = "g++ " .. "--std=c++" .. compiler_version .. " " .. warning_code .. " " 
 
         for i, v in ipairs(object_files) do
             link_command = link_command .. v .. " "
@@ -537,7 +565,7 @@ function Link_Project(is_info_enabled)
         end
         succes = os.execute(link_command)
     elseif project_type == "shared" then
-        link_command = "g++ -shared "
+        link_command = "g++ -shared " .. "--std=c++" .. compiler_version .. " " .. warning_code .. " " 
 
         for i, v in ipairs(object_files) do
             link_command = link_command .. " " .. object_folder .. seperator .. v
@@ -572,7 +600,7 @@ function Link_Project(is_info_enabled)
             end
         end
     else 
-        print(magenta .. "To see which object files linked and libraries used, use -i flag" .. reset)
+        print(magenta .. "To see which object files linked and libraries used, use -i flag\n" .. reset)
     end
 end
 
@@ -691,7 +719,7 @@ function Clean_Project(is_info_enabled)
             end
         end
     else 
-        print(magenta .. "To see which object files and binary cleaned, use -i flag" .. reset)
+        print(magenta .. "To see which object files and binary cleaned, use -i flag\n" .. reset)
     end
 end
 
